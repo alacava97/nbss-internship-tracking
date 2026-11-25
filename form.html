@@ -76,7 +76,7 @@
         font-weight: 700;
       }
 
-      input:not([type="checkbox"]), select {
+      input:not([type="checkbox"]), select, textarea {
         display: block;
         width: 100%;
         min-height: 44px;
@@ -88,7 +88,19 @@
         font: inherit;
       }
 
-      input:focus, select:focus {
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        resize: vertical;
+      }
+
+      input:focus, select:focus, textarea:focus {
         outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
         border-color: var(--brand);
       }
@@ -219,6 +231,32 @@
             <input id="provider" name="provider" type="text" placeholder="Festival, dealership, organization, etc." required>
           </div>
 
+          <div class="field">
+            <label for="contact-name">Opportunity Provider Contact Name</label>
+            <input id="contact-name" name="contact_name" type="text" autocomplete="name" required>
+          </div>
+
+          <div class="field">
+            <label for="contact-email">Contact Email</label>
+            <input id="contact-email" name="contact_email" type="email" autocomplete="email" required>
+          </div>
+
+          <div class="field">
+            <label for="contact-phone">Contact Phone</label>
+            <input id="contact-phone" name="contact_phone" type="tel" autocomplete="tel" required>
+          </div>
+
+          <div class="field full">
+            <label for="description">Internship Description</label>
+            <textarea id="description" name="description" rows="5" required placeholder="Describe the internship responsibilities, activities, and learning opportunities."></textarea>
+          </div>
+
+          <div class="field full">
+            <label for="supporting-documents">Supporting Documents</label>
+            <input id="supporting-documents" name="supporting_documents" type="file" accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png" multiple required>
+            <span class="help">Upload documents describing the internship, such as an opportunity announcement or position description. You may select multiple files.</span>
+          </div>
+
           <div class="field full">
             <label for="location">Location</label>
             <input id="location" name="location" type="text" placeholder="City, State" autocomplete="off" data-location-autocomplete="us-city-state" required>
@@ -321,6 +359,7 @@
         const unpaidCheckbox = document.getElementById('unpaid');
         const compensationFrequency = document.getElementById('compensation-frequency');
         const compensationAmount = document.getElementById('compensation-amount');
+        const supportingDocuments = document.getElementById('supporting-documents');
 
         function updateCompensationRequirements() {
           const unpaid = unpaidCheckbox.checked;
@@ -334,41 +373,65 @@
           }
         }
 
+        function readFileAsBase64(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({
+              name: file.name,
+              mimeType: file.type || 'application/octet-stream',
+              data: String(reader.result).split(',')[1]
+            });
+            reader.onerror = () => reject(new Error('Unable to read ' + file.name + '.'));
+            reader.readAsDataURL(file);
+          });
+        }
+
         unpaidCheckbox.addEventListener('change', updateCompensationRequirements);
         updateCompensationRequirements();
 
-        form.addEventListener('submit', function (event) {
+        form.addEventListener('submit', async function (event) {
           event.preventDefault();
           if (!form.reportValidity()) return;
 
-          const data = Object.fromEntries(new FormData(form).entries());
-          data.housing_provided = form.elements.housing_provided.checked;
-          data.meals_provided = form.elements.meals_provided.checked;
-          data.unpaid = form.elements.unpaid.checked;
-          data.overtime_available = form.elements.overtime_available.checked;
-          if (data.unpaid) {
-            data.compensation_frequency = '';
-            data.compensation_amount = '';
-          }
-
           submitButton.disabled = true;
           statusMessage.className = 'form-status';
-          statusMessage.textContent = 'Submitting opportunity…';
+          statusMessage.textContent = 'Preparing submission…';
 
-          google.script.run
-            .withSuccessHandler(function (result) {
-              statusMessage.className = 'form-status success';
-              statusMessage.textContent = result.message || 'Opportunity submitted successfully.';
-              form.reset();
-              updateCompensationRequirements();
-              submitButton.disabled = false;
-            })
-            .withFailureHandler(function (error) {
-              statusMessage.className = 'form-status error';
-              statusMessage.textContent = error.message || 'Unable to submit. Please try again.';
-              submitButton.disabled = false;
-            })
-            .saveInternshipOpportunity(data);
+          try {
+            const data = Object.fromEntries(new FormData(form).entries());
+            data.housing_provided = form.elements.housing_provided.checked;
+            data.meals_provided = form.elements.meals_provided.checked;
+            data.unpaid = form.elements.unpaid.checked;
+            data.overtime_available = form.elements.overtime_available.checked;
+            data.supporting_documents = await Promise.all(
+              Array.from(supportingDocuments.files).map(readFileAsBase64)
+            );
+
+            if (data.unpaid) {
+              data.compensation_frequency = '';
+              data.compensation_amount = '';
+            }
+
+            statusMessage.textContent = 'Submitting opportunity…';
+            google.script.run
+              .withSuccessHandler(function (result) {
+                statusMessage.className = 'form-status success';
+                statusMessage.textContent = result.message || 'Opportunity submitted successfully.';
+                form.reset();
+                updateCompensationRequirements();
+                submitButton.disabled = false;
+              })
+              .withFailureHandler(function (error) {
+                statusMessage.className = 'form-status error';
+                statusMessage.textContent = error.message || 'Unable to submit. Please try again.';
+                submitButton.disabled = false;
+              })
+              .saveInternshipOpportunity(data);
+          } catch (error) {
+            statusMessage.className = 'form-status error';
+            statusMessage.textContent = error.message || 'Unable to prepare the supporting documents.';
+            submitButton.disabled = false;
+          }
         });
       </script>
     </main>
