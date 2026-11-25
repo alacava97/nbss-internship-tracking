@@ -146,6 +146,33 @@
 
       .compensation-grid .check-option { min-height: 44px; }
 
+      .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-top: 30px;
+      }
+
+      button[type="submit"] {
+        min-height: 46px;
+        padding: 11px 26px;
+        border: 0;
+        border-radius: 3px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+
+      button[type="submit"]:hover { background: var(--brand-dark); }
+      button[type="submit"]:disabled { opacity: 0.65; cursor: wait; }
+
+      .form-status { margin: 0; color: var(--muted); font-size: 0.92rem; }
+      .form-status.success { color: #236b43; }
+      .form-status.error { color: #a12b2b; }
+
       @media (max-width: 600px) {
         body { padding: 18px 12px; }
         .container { padding: 26px 20px 30px; }
@@ -254,7 +281,46 @@
             </label>
           </div>
         </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" id="submit-button">Submit Opportunity</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
+        </div>
       </form>
+      <script>
+        const form = document.querySelector('form');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('form-status');
+
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          if (!form.reportValidity()) return;
+
+          const data = Object.fromEntries(new FormData(form).entries());
+          data.housing_provided = form.elements.housing_provided.checked;
+          data.meals_provided = form.elements.meals_provided.checked;
+          data.unpaid = form.elements.unpaid.checked;
+          data.overtime_available = form.elements.overtime_available.checked;
+
+          submitButton.disabled = true;
+          statusMessage.className = 'form-status';
+          statusMessage.textContent = 'Submitting opportunity…';
+
+          google.script.run
+            .withSuccessHandler(function (result) {
+              statusMessage.className = 'form-status success';
+              statusMessage.textContent = result.message || 'Opportunity submitted successfully.';
+              form.reset();
+              submitButton.disabled = false;
+            })
+            .withFailureHandler(function (error) {
+              statusMessage.className = 'form-status error';
+              statusMessage.textContent = error.message || 'Unable to submit. Please try again.';
+              submitButton.disabled = false;
+            })
+            .saveInternshipOpportunity(data);
+        });
+      </script>
     </main>
   </body>
 </html>
