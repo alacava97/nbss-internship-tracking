@@ -20,6 +20,14 @@ function doGet(e) {
   return template.evaluate().setTitle(initialData ? 'Update Internship Information' : 'Internships');
 }
 
+function getPublicWebAppUrl_() {
+  const url = ScriptApp.getService().getUrl();
+  if (!url || !url.endsWith('/exec')) {
+    throw new Error('The web app is not deployed. Deploy it as a web app and use the deployed URL ending in /exec.');
+  }
+  return url;
+}
+
 function authorizeDriveAccess() {
   // Run this once from the Apps Script editor to grant Drive access for uploads.
   DriveApp.getRootFolder().getName();
@@ -48,7 +56,7 @@ function createEditLinkForSelectedRow() {
     token = Utilities.getUuid();
     sheet.getRange(rowNumber, tokenColumn).setValue(token);
   }
-  const url = ScriptApp.getService().getUrl() + '?token=' + encodeURIComponent(token);
+  const url = getPublicWebAppUrl_() + '?token=' + encodeURIComponent(token);
   sheet.getRange(rowNumber, linkColumn).setValue(url);
   SpreadsheetApp.getUi().alert('Edit link created', url, SpreadsheetApp.getUi().ButtonSet.OK);
 }
@@ -213,7 +221,7 @@ function saveInternshipOpportunity(data) {
   Object.entries(values).forEach(([header, value]) => { newRow[headerMap[header] - 1] = value; });
   rowNumber = sheet.getLastRow() + 1;
   sheet.getRange(rowNumber, 1, 1, newRow.length).setValues([newRow]);
-  const url = ScriptApp.getService().getUrl() + '?token=' + encodeURIComponent(token);
+  const url = getPublicWebAppUrl_() + '?token=' + encodeURIComponent(token);
   sheet.getRange(rowNumber, headerMap['Edit Link']).setValue(url);
   return { success: true, message: 'Your submission has been recorded.' };
 }
