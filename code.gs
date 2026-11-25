@@ -160,7 +160,13 @@ function saveInternshipOpportunity(data) {
     throw new Error('Please attach at least one supporting document.');
   }
 
-  let documentLinks = existingDocuments;
+  const documentsToRemove = new Set(
+    Array.isArray(data.remove_supporting_documents) ? data.remove_supporting_documents.map(String) : []
+  );
+  const retainedDocuments = existingDocuments
+    ? existingDocuments.split(/\r?\n|\\n/).filter(entry => entry && !documentsToRemove.has(entry))
+    : [];
+  let documentLinks = retainedDocuments.join('\\n');
   if (uploadedDocuments.length) {
     const folderIterator = DriveApp.getFoldersByName(SUPPORTING_DOCUMENTS_FOLDER);
     const folder = folderIterator.hasNext() ? folderIterator.next() : DriveApp.createFolder(SUPPORTING_DOCUMENTS_FOLDER);
@@ -171,7 +177,7 @@ function saveInternshipOpportunity(data) {
       const file = folder.createFile(blob);
       return file.getName() + ': ' + file.getUrl();
     });
-    documentLinks = [existingDocuments, newLinks.join('\\n')].filter(Boolean).join('\\n');
+    documentLinks = [documentLinks, newLinks.join('\\n')].filter(Boolean).join('\\n');
   }
 
   if (!token) token = Utilities.getUuid();
