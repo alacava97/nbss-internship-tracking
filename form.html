@@ -242,11 +242,6 @@
           </div>
 
           <div class="field full">
-            <label for="contact-phone">Contact Phone</label>
-            <input id="contact-phone" name="contact_phone" type="tel" autocomplete="tel" required>
-          </div>
-
-          <div class="field full">
             <label for="description">Internship Description</label>
             <textarea id="description" name="description" rows="5" required placeholder="Describe the internship responsibilities, activities, and learning opportunities."></textarea>
           </div>
@@ -393,7 +388,7 @@
 
         if (isEditing) {
           const fieldNames = {
-            provider: 'provider', contact_name: 'contact_name', contact_email: 'contact_email', contact_phone: 'contact_phone',
+            provider: 'provider', contact_name: 'contact_name', contact_email: 'contact_email',
             description: 'description', location: 'location', start_date: 'start_date',
             duration: 'duration', duration_unit: 'duration_unit', intern_count: 'intern_count',
             application_deadline: 'application_deadline', compensation_frequency: 'compensation_frequency',
