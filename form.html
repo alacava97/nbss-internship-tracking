@@ -428,8 +428,21 @@
                 link.rel = 'noopener noreferrer';
                 item.appendChild(link);
               } else {
-                item.textContent = entry;
+                item.appendChild(document.createTextNode(entry));
               }
+              const removeLabel = document.createElement('label');
+              removeLabel.style.display = 'inline-flex';
+              removeLabel.style.alignItems = 'center';
+              removeLabel.style.gap = '6px';
+              removeLabel.style.marginLeft = '12px';
+              removeLabel.style.fontWeight = '500';
+              const removeCheckbox = document.createElement('input');
+              removeCheckbox.type = 'checkbox';
+              removeCheckbox.className = 'remove-supporting-document';
+              removeCheckbox.value = entry;
+              removeLabel.appendChild(removeCheckbox);
+              removeLabel.appendChild(document.createTextNode('Remove'));
+              item.appendChild(removeLabel);
               documentList.appendChild(item);
             });
             const documentHeading = document.createElement('strong');
@@ -466,6 +479,9 @@
             data.supporting_documents = await Promise.all(
               Array.from(supportingDocuments.files).map(readFileAsBase64)
             );
+            data.remove_supporting_documents = Array.from(
+              form.querySelectorAll('.remove-supporting-document:checked')
+            ).map(input => input.value);
             data.edit_token = initialData.edit_token || '';
 
             if (data.unpaid) {
