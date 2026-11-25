@@ -51,7 +51,7 @@ function createEditLinkForSelectedRow() {
 function ensureEditColumns_(sheet) {
   const lastColumn = Math.max(sheet.getLastColumn(), 1);
   const headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(String);
-  ['Edit Token', 'Edit Link'].forEach(header => {
+  ['Provider Contact Phone', 'Edit Token', 'Edit Link'].forEach(header => {
     if (!headers.includes(header)) {
       sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header);
       headers.push(header);
