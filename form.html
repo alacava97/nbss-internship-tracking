@@ -347,6 +347,9 @@
         </div>
       </form>
       <script>
+        const initialData = <?!= initialDataJson ?>;
+        const isEditing = <?= isEditing ?>;
+        const existingDocuments = initialData.supporting_documents || '';
         const form = document.querySelector('form');
         const submitButton = document.getElementById('submit-button');
         const statusMessage = document.getElementById('form-status');
@@ -383,6 +386,40 @@
         unpaidCheckbox.addEventListener('change', updateCompensationRequirements);
         updateCompensationRequirements();
 
+        if (isEditing) {
+          const fieldNames = {
+            provider: 'provider', contact_name: 'contact_name', contact_email: 'contact_email',
+            description: 'description', location: 'location', start_date: 'start_date',
+            duration: 'duration', duration_unit: 'duration_unit', intern_count: 'intern_count',
+            application_deadline: 'application_deadline', compensation_frequency: 'compensation_frequency',
+            compensation_amount: 'compensation_amount', car_requirement: 'car_requirement'
+          };
+          Object.entries(fieldNames).forEach(([key, name]) => {
+            if (form.elements[name]) form.elements[name].value = initialData[key] ?? '';
+          });
+          ['housing_provided', 'meals_provided', 'unpaid', 'overtime_available'].forEach(name => {
+            form.elements[name].checked = Boolean(initialData[name]);
+          });
+          updateCompensationRequirements();
+          supportingDocuments.required = false;
+          const documentHelp = document.createElement('span');
+          documentHelp.className = 'help';
+          documentHelp.textContent = existingDocuments
+            ? 'Existing supporting documents will be retained unless you attach additional files.'
+            : 'Attach at least one supporting document.';
+          supportingDocuments.parentElement.appendChild(documentHelp);
+          const tokenInput = document.createElement('input');
+          tokenInput.type = 'hidden';
+          tokenInput.name = 'edit_token';
+          tokenInput.value = initialData.edit_token;
+          form.appendChild(tokenInput);
+          document.querySelector('h1').textContent = 'Update Internship Information';
+          document.querySelector('.intro').textContent = 'Review and update the internship opportunity details below.';
+          submitButton.textContent = 'Save Changes';
+        } else {
+          supportingDocuments.required = true;
+        }
+
         form.addEventListener('submit', async function (event) {
           event.preventDefault();
           if (!form.reportValidity()) return;
@@ -400,6 +437,7 @@
             data.supporting_documents = await Promise.all(
               Array.from(supportingDocuments.files).map(readFileAsBase64)
             );
+            data.edit_token = initialData.edit_token || '';
 
             if (data.unpaid) {
               data.compensation_frequency = '';
@@ -411,7 +449,7 @@
               .withSuccessHandler(function (result) {
                 statusMessage.className = 'form-status success';
                 statusMessage.textContent = result.message || 'Opportunity submitted successfully.';
-                form.reset();
+                if (!isEditing) form.reset();
                 updateCompensationRequirements();
                 submitButton.disabled = false;
               })
