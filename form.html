@@ -1,92 +1,260 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Internship Opportunity Information</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #263238;
+        --muted: #5c6b70;
+        --brand: #176b70;
+        --brand-dark: #105257;
+        --gold: #c99b45;
+        --paper: #ffffff;
+        --page: #f4f3ef;
+        --line: #d8dfdc;
+        --focus: #e2b95f;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 40px 20px;
+        background: var(--page);
+        color: var(--ink);
+        font-family: Karla, "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .container {
+        width: min(100%, 760px);
+        margin: 0 auto;
+        padding: 36px 42px 42px;
+        background: var(--paper);
+        border-top: 5px solid var(--brand);
+        border-radius: 4px;
+        box-shadow: 0 8px 28px rgb(35 51 48 / 8%);
+      }
+
+      .eyebrow {
+        margin: 0 0 6px;
+        color: var(--brand);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      h1, h2 {
+        color: var(--brand-dark);
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 600;
+      }
+
+      h1 { margin: 0 0 8px; font-size: clamp(1.8rem, 4vw, 2.35rem); }
+      .intro { margin: 0 0 30px; color: var(--muted); }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px 22px;
+      }
+
+      .field { min-width: 0; }
+      .field.full { grid-column: 1 / -1; }
+
+      label, legend {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--ink);
+        font-size: 0.95rem;
+        font-weight: 700;
+      }
+
+      input:not([type="checkbox"]), select {
+        display: block;
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+      }
+
+      input:focus, select:focus {
+        outline: 3px solid color-mix(in srgb, var(--focus) 55%, transparent);
+        border-color: var(--brand);
+      }
+
+      .help {
+        display: block;
+        margin-top: 5px;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .inline-fields {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(130px, 0.8fr);
+        gap: 10px;
+      }
+
+      fieldset {
+        min-width: 0;
+        margin: 26px 0 0;
+        padding: 18px 20px 20px;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+      }
+
+      legend { padding: 0 7px; color: var(--brand-dark); }
+
+      .check-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 28px;
+      }
+
+      .check-option {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin: 0;
+        font-weight: 500;
+      }
+
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin: 0;
+        accent-color: var(--brand);
+      }
+
+      .compensation-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(130px, 0.8fr);
+        gap: 16px 20px;
+        align-items: end;
+      }
+
+      .compensation-grid .check-option { min-height: 44px; }
+
+      @media (max-width: 600px) {
+        body { padding: 18px 12px; }
+        .container { padding: 26px 20px 30px; }
+        .form-grid, .compensation-grid { grid-template-columns: 1fr; }
+        .field.full { grid-column: auto; }
+        .inline-fields { grid-template-columns: minmax(0, 1fr) minmax(110px, 0.8fr); }
+      }
+    </style>
   </head>
-  <style>
-    body {
-      background-color: #faf9f7;
-      color: #212529;
-      font-family: Karla, Helvetica, Arial, sans-serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      line-height: 1.5;
-      margin: 0;
-      text-align: left;
-    }
-
-    .container {
-      padding-left: 4rem;
-      padding-right: 4rem;
-      margin-left: auto;
-      margin-right: auto;
-      width: 100%;
-    }
-  </style>
   <body>
-    <div class="container">
+    <main class="container">
+      <p class="eyebrow">New England Conservatory of the Arts · Internship Opportunities</p>
       <h1>Internship Information</h1>
+      <p class="intro">Provide the details of the internship opportunity for NBSS students.</p>
+
       <form>
-        <label>
-          Opportunity Provider
-          <input placeholder="festival, dealership, etc.">
-        </label>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="provider">Opportunity Provider</label>
+            <input id="provider" name="provider" type="text" placeholder="Festival, dealership, organization, etc.">
+          </div>
 
-        <label>
-          Location
-          <input placeholder="city, state">
-        </label>
+          <div class="field full">
+            <label for="location">Location</label>
+            <input id="location" name="location" type="text" placeholder="City, State" autocomplete="off" data-location-autocomplete="us-city-state">
+            <span class="help">Enter the U.S. city and state. A street address is not needed.</span>
+          </div>
 
-        <label>
-          Start Date
-          <input type="date">
-        </label>
+          <div class="field">
+            <label for="start-date">Start Date</label>
+            <input id="start-date" name="start_date" type="date">
+          </div>
 
-        <label>
-          Length
-          <input type="number">
-          <select>
-            <option>Days</option>
-            <option>Weeks</option>
-          </select>
-        </label>
+          <div class="field">
+            <label for="duration">Internship Duration</label>
+            <div class="inline-fields">
+              <input id="duration" name="duration" type="number" min="1" step="1" placeholder="Length">
+              <select id="duration-unit" name="duration_unit" aria-label="Duration unit">
+                <option value="days">Days</option>
+                <option value="weeks" selected>Weeks</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+          </div>
 
-        <label>
-          Number of interns
-          <input type="number">
-        </label>
+          <div class="field">
+            <label for="intern-count">Number of Interns</label>
+            <input id="intern-count" name="intern_count" type="number" min="1" step="1">
+          </div>
 
-        <label>
-          Housing Provided
-          <input type="checkbox">
-        </label>
+          <div class="field">
+            <label for="deadline">Application Deadline</label>
+            <input id="deadline" name="application_deadline" type="date">
+          </div>
+        </div>
 
-        <label>
-          Meals Provided
-          <input type="checkbox">
-        </label>
+        <fieldset>
+          <legend>Additional Support</legend>
+          <div class="check-list">
+            <label class="check-option" for="housing">
+              <input id="housing" name="housing_provided" type="checkbox" value="yes">
+              Housing provided
+            </label>
+            <label class="check-option" for="meals">
+              <input id="meals" name="meals_provided" type="checkbox" value="yes">
+              Meals provided
+            </label>
+          </div>
+        </fieldset>
 
-        <label>
-          Car Required
-          <input type="checkbox">
-        </label>
+        <fieldset>
+          <legend>Transportation</legend>
+          <div class="field">
+            <label for="car-requirement">Car Requirement</label>
+            <select id="car-requirement" name="car_requirement">
+              <option value="not_required">Not required</option>
+              <option value="recommended">Recommended, but not required</option>
+              <option value="required">Required</option>
+            </select>
+          </div>
+        </fieldset>
 
-        <label>
-          Compensation
-          <select>
-            <option>Hourly</option>
-            <option>Weekly</option>
-          </select>
-          <input>
-          Overtime
-          <input type="checkbox">
-        </label>
-
-        <label>
-          Application Deadline
-          <input type="date">
-        </label>
+        <fieldset>
+          <legend>Compensation</legend>
+          <div class="compensation-grid">
+            <div class="field">
+              <label for="compensation-frequency">Payment Frequency</label>
+              <select id="compensation-frequency" name="compensation_frequency">
+                <option value="">Select frequency</option>
+                <option value="hourly">Hourly</option>
+                <option value="weekly">Weekly</option>
+                <option value="lump_sum">Lump sum</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="compensation-amount">Compensation Amount</label>
+              <input id="compensation-amount" name="compensation_amount" type="number" min="0" step="0.01" placeholder="Amount in USD">
+            </div>
+            <label class="check-option" for="unpaid">
+              <input id="unpaid" name="unpaid" type="checkbox" value="yes">
+              Unpaid internship
+            </label>
+            <label class="check-option" for="overtime">
+              <input id="overtime" name="overtime_available" type="checkbox" value="yes">
+              Overtime available
+            </label>
+          </div>
+        </fieldset>
       </form>
-    </div>
+    </main>
   </body>
 </html>
