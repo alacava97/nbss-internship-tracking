@@ -11,6 +11,9 @@ const SUPPORTING_DOCUMENTS_FOLDER = 'Internship Supporting Documents';
 function doGet(e) {
   const token = e && e.parameter ? String(e.parameter.token || '') : '';
   const initialData = token ? getInternshipByEditToken_(token) : null;
+  if (token && !initialData) {
+    return HtmlService.createHtmlOutput('This edit link is invalid or no longer available.');
+  }
   const template = HtmlService.createTemplateFromFile('form');
   template.initialDataJson = JSON.stringify(initialData || {}).replace(/</g, '\\u003c');
   template.isEditing = Boolean(initialData);
@@ -88,6 +91,7 @@ function getInternshipByEditToken_(token) {
     application_deadline: dateString(get('Application Deadline')),
     contact_name: get('Provider Contact Name'),
     contact_email: get('Provider Contact Email'),
+    contact_phone: get('Provider Contact Phone'),
     description: get('Internship Description'),
     supporting_documents: get('Supporting Documents')
   };
@@ -97,7 +101,7 @@ function saveInternshipOpportunity(data) {
   if (!data || typeof data !== 'object') throw new Error('No internship information was received.');
 
   const requiredFields = [
-    'provider', 'contact_name', 'contact_email', 'description', 'location',
+    'provider', 'contact_name', 'contact_email', 'contact_phone', 'description', 'location',
     'start_date', 'duration', 'duration_unit', 'intern_count',
     'application_deadline', 'car_requirement'
   ];
@@ -184,6 +188,7 @@ function saveInternshipOpportunity(data) {
     'Application Deadline': dateValue(data.application_deadline),
     'Provider Contact Name': textValue(data.contact_name),
     'Provider Contact Email': textValue(data.contact_email),
+    'Provider Contact Phone': textValue(data.contact_phone),
     'Internship Description': textValue(data.description),
     'Supporting Documents': documentLinks,
     'Edit Token': token
