@@ -146,12 +146,63 @@
 
       .compensation-grid .check-option { min-height: 44px; }
 
+      .form-actions {
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+      }
+
+      #submit-button {
+        display: inline-flex;
+        min-width: 190px;
+        min-height: 48px;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 26px;
+        border: 2px solid var(--brand);
+        border-radius: 3px;
+        background: var(--brand);
+        color: #fff;
+        font: inherit;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        cursor: pointer;
+        transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+      }
+
+      #submit-button:hover:not(:disabled) {
+        border-color: var(--brand-dark);
+        background: var(--brand-dark);
+        box-shadow: 0 3px 9px rgb(16 82 87 / 20%);
+        transform: translateY(-1px);
+      }
+
+      #submit-button:focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 3px;
+      }
+
+      #submit-button:disabled {
+        opacity: 0.65;
+        cursor: wait;
+      }
+
+      .form-status {
+        min-height: 1.5em;
+        margin: 12px 0 0;
+        color: var(--muted);
+      }
+
+      .form-status.success { color: var(--brand-dark); }
+      .form-status.error { color: #a12622; }
+
       @media (max-width: 600px) {
         body { padding: 18px 12px; }
         .container { padding: 26px 20px 30px; }
         .form-grid, .compensation-grid { grid-template-columns: 1fr; }
         .field.full { grid-column: auto; }
         .inline-fields { grid-template-columns: minmax(0, 1fr) minmax(110px, 0.8fr); }
+        #submit-button { width: 100%; }
       }
     </style>
   </head>
@@ -165,25 +216,26 @@
         <div class="form-grid">
           <div class="field full">
             <label for="provider">Opportunity Provider</label>
-            <input id="provider" name="provider" type="text" placeholder="Festival, dealership, organization, etc.">
+            <input id="provider" name="provider" type="text" placeholder="Festival, dealership, organization, etc." required>
           </div>
 
           <div class="field full">
             <label for="location">Location</label>
-            <input id="location" name="location" type="text" placeholder="City, State" autocomplete="off" data-location-autocomplete="us-city-state">
+            <input id="location" name="location" type="text" placeholder="City, State" autocomplete="off" data-location-autocomplete="us-city-state" required>
             <span class="help">Where will the internship take place?</span>
           </div>
 
           <div class="field">
             <label for="start-date">Start Date</label>
-            <input id="start-date" name="start_date" type="date">
+            <input id="start-date" name="start_date" type="date" required>
           </div>
 
           <div class="field">
             <label for="duration">Internship Duration</label>
             <div class="inline-fields">
-              <input id="duration" name="duration" type="number" min="1" step="1" placeholder="Length">
-              <select id="duration-unit" name="duration_unit" aria-label="Duration unit">
+              <input id="duration" name="duration" type="number" min="1" step="1" placeholder="Length" required>
+              <select id="duration-unit" name="duration_unit" aria-label="Duration unit" required>
+                <option value="">Select unit</option>
                 <option value="days">Days</option>
                 <option value="weeks" selected>Weeks</option>
                 <option value="months">Months</option>
@@ -193,12 +245,12 @@
 
           <div class="field">
             <label for="intern-count">Number of Interns</label>
-            <input id="intern-count" name="intern_count" type="number" min="1" step="1">
+            <input id="intern-count" name="intern_count" type="number" min="1" step="1" required>
           </div>
 
           <div class="field">
             <label for="deadline">Application Deadline</label>
-            <input id="deadline" name="application_deadline" type="date">
+            <input id="deadline" name="application_deadline" type="date" required>
           </div>
         </div>
 
@@ -227,6 +279,7 @@
               Overtime available
             </label>
           </div>
+          <span class="help">Select “Unpaid internship” if no compensation is offered. Otherwise, pay period and amount are required.</span>
         </fieldset>
 
         <fieldset>
@@ -247,14 +300,15 @@
           <legend>Transportation</legend>
           <div class="field">
             <label for="car-requirement">Car Requirement</label>
-            <select id="car-requirement" name="car_requirement">
+            <select id="car-requirement" name="car_requirement" required>
+              <option value="">Select requirement</option>
               <option value="not_required">Not required</option>
               <option value="recommended">Recommended, but not required</option>
               <option value="required">Required</option>
             </select>
           </div>
         </fieldset>
-        
+
         <div class="form-actions">
           <button type="submit" id="submit-button">Submit Opportunity</button>
           <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
@@ -264,6 +318,24 @@
         const form = document.querySelector('form');
         const submitButton = document.getElementById('submit-button');
         const statusMessage = document.getElementById('form-status');
+        const unpaidCheckbox = document.getElementById('unpaid');
+        const compensationFrequency = document.getElementById('compensation-frequency');
+        const compensationAmount = document.getElementById('compensation-amount');
+
+        function updateCompensationRequirements() {
+          const unpaid = unpaidCheckbox.checked;
+          compensationFrequency.required = !unpaid;
+          compensationAmount.required = !unpaid;
+          compensationFrequency.disabled = unpaid;
+          compensationAmount.disabled = unpaid;
+          if (unpaid) {
+            compensationFrequency.value = '';
+            compensationAmount.value = '';
+          }
+        }
+
+        unpaidCheckbox.addEventListener('change', updateCompensationRequirements);
+        updateCompensationRequirements();
 
         form.addEventListener('submit', function (event) {
           event.preventDefault();
@@ -274,6 +346,10 @@
           data.meals_provided = form.elements.meals_provided.checked;
           data.unpaid = form.elements.unpaid.checked;
           data.overtime_available = form.elements.overtime_available.checked;
+          if (data.unpaid) {
+            data.compensation_frequency = '';
+            data.compensation_amount = '';
+          }
 
           submitButton.disabled = true;
           statusMessage.className = 'form-status';
@@ -284,6 +360,7 @@
               statusMessage.className = 'form-status success';
               statusMessage.textContent = result.message || 'Opportunity submitted successfully.';
               form.reset();
+              updateCompensationRequirements();
               submitButton.disabled = false;
             })
             .withFailureHandler(function (error) {
