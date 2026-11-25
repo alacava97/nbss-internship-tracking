@@ -1,3 +1,9 @@
+//to do
+//-create a way to reopen submitted forms and repopulate the submitted data.
+//-Student facing page to allow students to browse internships
+//-Are we supposed to call them something else besieds internships?
+//-Create a way for this to expand to other departments, potentially including an admin panel on the spreadsheet page
+
 const SPREADSHEET_ID = '1xguSZeNZD-lXfcFQosPgUqaKvT06f_XNXDQuibg5SYM';
 const SHEET_NAME = 'Internship Opportunities';
 const SUPPORTING_DOCUMENTS_FOLDER = 'Internship Supporting Documents';
@@ -12,7 +18,7 @@ function saveInternshipOpportunity(data) {
   }
 
   const requiredFields = [
-    'provider', 'contact_name', 'contact_email', 'contact_phone',
+    'provider', 'contact_name', 'contact_email',
     'description', 'location', 'start_date', 'duration', 'duration_unit',
     'intern_count', 'application_deadline', 'car_requirement'
   ];
@@ -55,7 +61,6 @@ function saveInternshipOpportunity(data) {
     'Application Deadline',
     'Provider Contact Name',
     'Provider Contact Email',
-    'Provider Contact Phone',
     'Internship Description',
     'Supporting Documents'
   ];
@@ -128,7 +133,6 @@ function saveInternshipOpportunity(data) {
     dateValue(data.application_deadline),
     textValue(data.contact_name),
     textValue(data.contact_email),
-    textValue(data.contact_phone),
     textValue(data.description),
     documentLinks.join('\n')
   ];
