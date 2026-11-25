@@ -414,13 +414,13 @@
             documentList.className = 'help';
             documentList.style.paddingLeft = '20px';
             documentList.style.marginTop = '8px';
-            const entries = existingDocuments.split(/\\r?\\n|\\\\n/).filter(Boolean);
+            const entries = existingDocuments.split(/\r?\n|\\n/).filter(Boolean);
             entries.forEach(entry => {
               const separator = entry.indexOf(': http');
               const fileName = separator >= 0 ? entry.slice(0, separator).trim() : 'Supporting document';
               const fileUrl = separator >= 0 ? entry.slice(separator + 2).trim() : '';
               const item = document.createElement('li');
-              if (/^https:\\/\\//i.test(fileUrl)) {
+              if (/^https:\/\//i.test(fileUrl)) {
                 const link = document.createElement('a');
                 link.href = fileUrl;
                 link.textContent = fileName || 'Open supporting document';
