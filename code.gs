@@ -1,3 +1,10 @@
+//to do
+//-create a way to reopen submitted forms and repopulate the submitted data.
+//-Student facing page to allow students to browse internships
+//-Are we supposed to call them something else besieds internships?
+//-Add contact info and supporting documents to form.
+//-Create a way for this to expand to other departments, potentially including an admin panel on the spreadsheet page
+
 const SPREADSHEET_ID = '1xguSZeNZD-lXfcFQosPgUqaKvT06f_XNXDQuibg5SYM';
 const SHEET_NAME = 'Internship Opportunities';
 
@@ -8,44 +15,6 @@ function doGet() {
 function saveInternshipOpportunity(data) {
   if (!data || typeof data !== 'object') {
     throw new Error('No internship information was received.');
-  }
-
-  const requiredFields = [
-    ['provider', 'Opportunity Provider'],
-    ['location', 'Location'],
-    ['start_date', 'Start Date'],
-    ['duration', 'Internship Duration'],
-    ['duration_unit', 'Duration Unit'],
-    ['intern_count', 'Number of Interns'],
-    ['application_deadline', 'Application Deadline'],
-    ['car_requirement', 'Car Requirement']
-  ];
-
-  requiredFields.forEach(([key, label]) => {
-    if (data[key] == null || String(data[key]).trim() === '') {
-      throw new Error(label + ' is required.');
-    }
-  });
-
-  if (!Number.isInteger(Number(data.duration)) || Number(data.duration) < 1) {
-    throw new Error('Internship Duration must be a whole number greater than zero.');
-  }
-  if (!Number.isInteger(Number(data.intern_count)) || Number(data.intern_count) < 1) {
-    throw new Error('Number of Interns must be a whole number greater than zero.');
-  }
-  if (!['days', 'weeks', 'months'].includes(data.duration_unit)) {
-    throw new Error('Please select a valid duration unit.');
-  }
-  if (!['not_required', 'recommended', 'required'].includes(data.car_requirement)) {
-    throw new Error('Please select a valid car requirement.');
-  }
-  if (!data.unpaid) {
-    if (!['hourly', 'weekly', 'lump_sum'].includes(data.compensation_frequency)) {
-      throw new Error('Pay Period is required unless the internship is unpaid.');
-    }
-    if (data.compensation_amount == null || String(data.compensation_amount).trim() === '') {
-      throw new Error('Compensation Amount is required unless the internship is unpaid.');
-    }
   }
 
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -94,13 +63,7 @@ function saveInternshipOpportunity(data) {
     if (!value) return '';
     const match = String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!match) throw new Error('Please enter valid dates.');
-    const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12);
-    if (date.getFullYear() !== Number(match[1]) ||
-        date.getMonth() !== Number(match[2]) - 1 ||
-        date.getDate() !== Number(match[3])) {
-      throw new Error('Please enter valid dates.');
-    }
-    return date;
+    return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12);
   };
 
   const row = [
@@ -114,13 +77,13 @@ function saveInternshipOpportunity(data) {
     Boolean(data.housing_provided),
     Boolean(data.meals_provided),
     textValue(data.car_requirement),
-    data.unpaid ? '' : textValue(data.compensation_frequency),
-    data.unpaid ? '' : numberValue(data.compensation_amount),
+    textValue(data.compensation_frequency),
+    numberValue(data.compensation_amount),
     Boolean(data.unpaid),
     Boolean(data.overtime_available),
     dateValue(data.application_deadline)
   ];
 
   sheet.appendRow(row);
-  return { success: true, message: 'Internship opportunity saved to the spreadsheet.' };
+  return { success: true, message: 'Your submission has been recorded.' };
 }
