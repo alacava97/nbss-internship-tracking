@@ -20,6 +20,11 @@ function doGet(e) {
   return template.evaluate().setTitle(initialData ? 'Update Internship Information' : 'Internships');
 }
 
+function authorizeDriveAccess() {
+  // Run this once from the Apps Script editor to grant Drive access for uploads.
+  DriveApp.getRootFolder().getName();
+}
+
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('Internship Form')
