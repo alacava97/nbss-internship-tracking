@@ -56,7 +56,7 @@ function createEditLinkForSelectedRow() {
 function ensureEditColumns_(sheet) {
   const lastColumn = Math.max(sheet.getLastColumn(), 1);
   const headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0].map(String);
-  ['Provider Contact Phone', 'Edit Token', 'Edit Link'].forEach(header => {
+  ['Edit Token', 'Edit Link'].forEach(header => {
     if (!headers.includes(header)) {
       sheet.getRange(1, sheet.getLastColumn() + 1).setValue(header);
       headers.push(header);
@@ -96,7 +96,6 @@ function getInternshipByEditToken_(token) {
     application_deadline: dateString(get('Application Deadline')),
     contact_name: get('Provider Contact Name'),
     contact_email: get('Provider Contact Email'),
-    contact_phone: get('Provider Contact Phone'),
     description: get('Internship Description'),
     supporting_documents: get('Supporting Documents')
   };
@@ -106,7 +105,7 @@ function saveInternshipOpportunity(data) {
   if (!data || typeof data !== 'object') throw new Error('No internship information was received.');
 
   const requiredFields = [
-    'provider', 'contact_name', 'contact_email', 'contact_phone', 'description', 'location',
+    'provider', 'contact_name', 'contact_email', 'description', 'location',
     'start_date', 'duration', 'duration_unit', 'intern_count',
     'application_deadline', 'car_requirement'
   ];
@@ -193,7 +192,6 @@ function saveInternshipOpportunity(data) {
     'Application Deadline': dateValue(data.application_deadline),
     'Provider Contact Name': textValue(data.contact_name),
     'Provider Contact Email': textValue(data.contact_email),
-    'Provider Contact Phone': textValue(data.contact_phone),
     'Internship Description': textValue(data.description),
     'Supporting Documents': documentLinks,
     'Edit Token': token
