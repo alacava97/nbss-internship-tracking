@@ -63,6 +63,13 @@ function saveInternshipOpportunity(data) {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(headers);
     sheet.setFrozenRows(1);
+  } else {
+    const existingHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    const missingHeaders = headers.filter(header => !existingHeaders.includes(header));
+    if (missingHeaders.length) {
+      sheet.getRange(1, existingHeaders.length + 1, 1, missingHeaders.length)
+        .setValues([missingHeaders]);
+    }
   }
 
   const textValue = value => {
