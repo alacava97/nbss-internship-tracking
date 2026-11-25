@@ -36,14 +36,10 @@ function saveInternshipOpportunity(data) {
   let sheet = spreadsheet.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = spreadsheet.insertSheet(SHEET_NAME);
 
+  // Keep the original columns in place so existing spreadsheet rows remain aligned.
   const headers = [
     'Submitted At',
     'Opportunity Provider',
-    'Provider Contact Name',
-    'Provider Contact Email',
-    'Provider Contact Phone',
-    'Internship Description',
-    'Supporting Documents',
     'Location',
     'Start Date',
     'Duration',
@@ -56,7 +52,12 @@ function saveInternshipOpportunity(data) {
     'Compensation Amount (USD)',
     'Unpaid Internship',
     'Overtime Available',
-    'Application Deadline'
+    'Application Deadline',
+    'Provider Contact Name',
+    'Provider Contact Email',
+    'Provider Contact Phone',
+    'Internship Description',
+    'Supporting Documents'
   ];
 
   if (sheet.getLastRow() === 0) {
@@ -105,11 +106,6 @@ function saveInternshipOpportunity(data) {
   const row = [
     new Date(),
     textValue(data.provider),
-    textValue(data.contact_name),
-    textValue(data.contact_email),
-    textValue(data.contact_phone),
-    textValue(data.description),
-    documentLinks.join('\\n'),
     textValue(data.location),
     dateValue(data.start_date),
     numberValue(data.duration),
@@ -122,7 +118,12 @@ function saveInternshipOpportunity(data) {
     data.unpaid ? '' : numberValue(data.compensation_amount),
     Boolean(data.unpaid),
     Boolean(data.overtime_available),
-    dateValue(data.application_deadline)
+    dateValue(data.application_deadline),
+    textValue(data.contact_name),
+    textValue(data.contact_email),
+    textValue(data.contact_phone),
+    textValue(data.description),
+    documentLinks.join('\\n')
   ];
 
   sheet.appendRow(row);
